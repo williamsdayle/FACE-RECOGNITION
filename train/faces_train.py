@@ -8,7 +8,7 @@ def train(img_dir, flag):
 
     cascade_face = cv2.CascadeClassifier('../cascades/data/haarcascade_frontalface_alt2.xml')
 
-    recognizer = cv2.face.EigenFaceRecognizer_create()
+    recognizer = cv2.face.LBPHFaceRecognizer_create()
 
     if flag == 1:
 
@@ -41,11 +41,11 @@ def train(img_dir, flag):
                 if label not in labels_ids:
                     labels_ids[label] = current_id
                     current_id += 1
-                id_ = labels_ids[label]
+                id_ = int(labels_ids[label])
 
-                y_labels.append(label)
+                #y_labels.append(label)
 
-                x_train.append(path)
+                #x_train.append(path)
 
                 pil_image = Image.open(path).convert('L')  # Conversão em escala de cinza
 
@@ -58,13 +58,14 @@ def train(img_dir, flag):
                 faces = cascade_face.detectMultiScale(image_array, scaleFactor=1.5, minNeighbors=5)
 
                 for (x, y, w, h) in faces:
+
                     segmentation = image_array[y:y + h, x:x + w]
 
                     x_train.append(segmentation)
 
                     y_labels.append(id_)
 
-    with open('lebels.pickle', 'wb') as f:
+    with open('labels.pickle', 'wb') as f:
         pickle.dump(labels_ids, f)
 
     recognizer.train(x_train, np.array(y_labels))
