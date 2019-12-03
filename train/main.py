@@ -68,7 +68,7 @@ if option == 2:
 
             cv2.rectangle(frame, (x, y), (x + w, y + h), color, stroke)
 
-            cv2.imshow('Ola ' + nome_da_pessoa + 'restam ' + str(contador_imagem) + 'a serem extraídas', frame)
+        cv2.imshow('Ola', frame)
 
         if cv2.waitKey(20) & 0xFF == ord('q') or contador_imagem >=100:
             break
@@ -86,7 +86,7 @@ recognizer.read('trainner.yml')
 
 labels = {'person_name':1}
 
-with open('lebels.pickle', 'rb') as f:
+with open('labels.pickle', 'rb') as f:
     labels = pickle.load(f)
     labels = {v:k for k,v in labels.items()}
 
@@ -95,16 +95,18 @@ dir_predict_img = str(input('Digite o diretório da imagem a ser predita: '))
 
 predict_image = cv2.imread(dir_predict_img)
 
+predict_image = cv2.cvtColor(predict_image, cv2.COLOR_BGR2GRAY)
+
 id_, conf = recognizer.predict(predict_image)
 
 if conf >= 4 and conf <= 85:
-    font = cv2.FONT_HERSEY_SIMPLEX
     name = labels[id_]
     color = (255, 255, 255)
     stroke = 2
-    cv2.putText(predict_image, name, (x, y), font, 1, color, stroke, cv2.LINE_AA)
+    cv2.putText(predict_image, name, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, color, stroke, cv2.LINE_AA)
     cv2.rectangle(predict_image, (x, y), (x + w, y + h), color, stroke)
-cv2.imshow('Olá', predict_image)
+cv2.imshow('Olá', cv2.resize(predict_image, (600, 600)))
+cv2.waitKey(10000)
 
 if cv2.waitKey(20) & 0xFF == ord('q'):
     cv2.destroyAllWindows()
